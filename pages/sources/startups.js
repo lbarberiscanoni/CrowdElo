@@ -4,7 +4,9 @@ import firebase from 'firebase';
 import { useList } from 'react-firebase-hooks/database';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Button, Spinner } from 'react-bootstrap';
+import { Container, Button, Spinner, Row, Col} from 'react-bootstrap';
+
+import Item from "../../components/Item";
 
 if (!firebase.apps.length) {
 	firebase.initializeApp(
@@ -23,13 +25,54 @@ if (!firebase.apps.length) {
 
 const Startups = () => {
 
-	const [snapshots, loading, error] = useList(firebase.database().ref('/'));
+	const [snapshots, loading, error] = useList(firebase.database().ref('/alice/items'));
+	const [companies, changeCompanies] = useState([])
+
+	const findPair = () => {
+		let numOfStartups = snapshots.length
+
+		let firstCo = Math.floor(Math.random() * (numOfStartups - 0 + 1) ) + 0
+		let secondCo = Math.floor(Math.random() * (numOfStartups - 0 + 1) ) + 0
+
+		if (firstCo === secondCo) {
+			secondCo = Math.floor(Math.random() * (numOfStartups - 0 + 1) ) + 0
+		}
+
+		return [snapshots[firstCo].val(), snapshots[secondCo].val()]
+	}
 
 	if (snapshots.length > 0) {
 		return(
 			<Container>
 				<h1>Startups</h1>
-				<Button>Hello</Button>
+				<Button
+					hidden={companies.length > 0}
+					onClick={() => changeCompanies(findPair())}
+				>
+					Start
+				</Button>
+				{ companies.length > 0 ? <Row>
+						<Col xs="auto">
+							<a 
+								onClick={() => changeCompanies(findPair())}
+							>
+								<Item 
+									info={companies[0].info} 
+								/>
+							</a>
+						</Col>
+						<Col xs="auto">
+							<a
+								onClick={() => changeCompanies(findPair())}
+							>
+								<Item 
+									info={companies[1].info} 
+								/>
+							</a>
+						</Col>
+					</Row>
+					: ""
+				}
 			</Container>
 		)
 	} else {
