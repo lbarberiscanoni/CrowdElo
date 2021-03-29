@@ -26,7 +26,7 @@ if (!firebase.apps.length) {
 const Results = () => {
 
 	const [snapshots, loading, error] = useList(firebase.database().ref('/alice/items'));
-	const [dimensionUnderConsideration, changeDimension] = useState("interest")
+	const [dimensionUnderConsideration, changeDimension] = useState("overall")
 
 	const handleChange = (e) => {
 		const newDim = e.split("#")[1].toString()
@@ -36,7 +36,8 @@ const Results = () => {
 	if (snapshots.length > 0) {
 		let vals = []
 		snapshots.map((snapshot) => {
-			vals.push(snapshot.val().dimensions[dimensionUnderConsideration])
+			const allVals = Object.values(snapshot.val().dimensions)
+			vals = vals.concat(allVals)
 		})
 		return(
 			<Container>
@@ -58,15 +59,43 @@ const Results = () => {
 										return <Dropdown.Item href={"#" + dimension}>{ dimension }</Dropdown.Item>
 									})
 								}
+								<Dropdown.Item href="#overall">Overall</Dropdown.Item>
 							</Dropdown.Menu>
 						</Dropdown>
 					</InputGroup>
 				</Row>
 				{
 					snapshots.sort((a, b) => {
-			  			return b.val().dimensions[dimensionUnderConsideration] - a.val().dimensions[dimensionUnderConsideration]
+						if (dimensionUnderConsideration === "overall") {
+							let comparison = 0
+
+							let a_weighed_dim = 0
+							Object.values(a.val().dimensions).map((dimension) => {
+								const weight = .3
+								const weighed_score = dimension * weight
+								a_weighed_dim += weighed_score
+							})
+
+							let b_weighed_dim = 0
+							Object.values(b.val().dimensions).map((dimension) => {
+								const weight = .3
+								const weighed_score = dimension * weight
+								b_weighed_dim += weighed_score
+							})
+
+							if (a_weighed_dim < b_weighed_dim) {
+								comparison = 1
+							} else if (a_weighed_dim > b_weighed_dim) {
+								comparison = -1
+							} else {
+								comparison = 0
+							}
+
+							return comparison
+						} else {
+			 				return b.val().dimensions[dimensionUnderConsideration] - a.val().dimensions[dimensionUnderConsideration]
+			  			}
 			  		}).map((snapshot) => {
-			  			console.log(vals)
 						return <Row>
 						<Col xs="8">
 							<Snowflake 
