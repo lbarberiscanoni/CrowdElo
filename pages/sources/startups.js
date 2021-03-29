@@ -28,7 +28,7 @@ const Startups = () => {
 	const [snapshots, loading, error] = useList(firebase.database().ref('/alice/items'));
 	const [companies, changeCompanies] = useState([])
 
-	let dimension = {}
+	let dimension = ""
 
 	useEffect(() => {
 		dimension = window.location.href.split("?")[1]
@@ -99,22 +99,24 @@ const Startups = () => {
 				</Button>
 				{ companies.length > 0 ? <Row>
 						<Col xs="auto">
-							<a 
+							<Item 
+								info={companies[0]["co"].info} 
+							/>
+							<Button 
 								onClick={() => updateMatchup(0)}
 							>
-								<Item 
-									info={companies[0]["co"].info} 
-								/>
-							</a>
+								Most { window.location.href.split("?")[1] }
+							</Button>
 						</Col>
 						<Col xs="auto">
-							<a
+							<Item 
+								info={companies[1]["co"].info} 
+							/>
+							<Button 
 								onClick={() => updateMatchup(1)}
 							>
-								<Item 
-									info={companies[1]["co"].info} 
-								/>
-							</a>
+								Most { window.location.href.split("?")[1] }
+							</Button>
 						</Col>
 					</Row>
 					: ""
