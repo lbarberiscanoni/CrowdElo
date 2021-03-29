@@ -4,7 +4,6 @@ import { Container, Button, Spinner, Row, Col, InputGroup, Dropdown, DropdownBut
 import { Radar } from 'react-chartjs-2'
 
 const Snowflake = (props) => {
-	console.log(props.data)
 	const data = {
 		labels: Object.keys(props.data),
 		datasets: [
@@ -15,12 +14,16 @@ const Snowflake = (props) => {
 				borderColor: 'rgba(255, 99, 132, 1)',
 				borderWidth: 1,
 			},
-		],
+		],	
 	}
 
 	const options = {
 		scale: {
-			ticks: { beginAtZero: true },
+			ticks: { 
+				min: props.min,
+            	max: props.max,
+            	stepSize: 50
+           	}
 		}
 	}
 

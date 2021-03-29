@@ -34,6 +34,10 @@ const Results = () => {
 	}
 
 	if (snapshots.length > 0) {
+		let vals = []
+		snapshots.map((snapshot) => {
+			vals.push(snapshot.val().dimensions[dimensionUnderConsideration])
+		})
 		return(
 			<Container>
 				<h1>Results for Startups</h1>
@@ -60,14 +64,16 @@ const Results = () => {
 				</Row>
 				{
 					snapshots.sort((a, b) => {
-						console.log(dimensionUnderConsideration)
 			  			return b.val().dimensions[dimensionUnderConsideration] - a.val().dimensions[dimensionUnderConsideration]
 			  		}).map((snapshot) => {
+			  			console.log(vals)
 						return <Row>
 						<Col xs="8">
 							<Snowflake 
 								info={snapshot.val().info} 
 								data={snapshot.val().dimensions}
+								max={Math.max(...vals)}
+								min={Math.min(...vals)}
 							/>
 						</Col>
 						</Row>
