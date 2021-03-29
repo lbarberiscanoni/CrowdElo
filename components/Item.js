@@ -8,9 +8,11 @@ const Item = (props) => {
 	return(
 		<Card>
 			<Card.Body>
-				<Card.Title>
-					{ props.info["Name"] }
-				</Card.Title>
+				<a href={ props.info["Link"]} target="_blank">
+					<Card.Title>
+						{ props.info["Name"] }
+					</Card.Title>
+				</a>
 				<Card.Subtitle>
 					{ props.info["Stage"] }
 				</Card.Subtitle>

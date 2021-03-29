@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import { useList } from 'react-firebase-hooks/database';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Button, Spinner, Row, Col} from 'react-bootstrap';
+import { Container, Button, Spinner, Row, Col, ProgressBar} from 'react-bootstrap';
 
 import Item from "../../components/Item";
 
@@ -27,6 +27,7 @@ const Startups = () => {
 
 	const [snapshots, loading, error] = useList(firebase.database().ref('/alice/items'));
 	const [companies, changeCompanies] = useState([])
+	const [count, changeCount] = useState(0)
 
 	let dimension = ""
 
@@ -85,44 +86,81 @@ const Startups = () => {
 			.update(update)
 
 		changeCompanies(findPair())
+		changeCount(count + 1)
+	}
+
+	const generatePrompt = () => {
+		dimension = window.location.href.split("?")[1]
+		let prompt = ""
+		if (dimension === "interest") {
+			prompt = "Which startup do you find most interesting?"
+		} else if (dimension === "invest") {
+			prompt = "Which startup would you rather invest in?"
+		} else if (dimension === "work") {
+			prompt = "Which startup would you rather work at?"
+		} else if (dimension === "") {
+			prompt = "Select a parameter"
+		}
+
+		return prompt
 	}
 
 	if (snapshots.length > 0) {
-		return(
-			<Container>
-				<h1>Startups</h1>
-				<Button
-					hidden={companies.length > 0}
-					onClick={() => changeCompanies(findPair())}
-				>
-					Start
-				</Button>
-				{ companies.length > 0 ? <Row>
-						<Col xs="auto">
-							<Item 
-								info={companies[0]["co"].info} 
-							/>
-							<Button 
-								onClick={() => updateMatchup(0)}
-							>
-								Most { window.location.href.split("?")[1] }
-							</Button>
-						</Col>
-						<Col xs="auto">
-							<Item 
-								info={companies[1]["co"].info} 
-							/>
-							<Button 
-								onClick={() => updateMatchup(1)}
-							>
-								Most { window.location.href.split("?")[1] }
-							</Button>
-						</Col>
+		if (count < 100) {
+			return(
+				<Container>
+					<h1>Startups</h1>
+					<Button
+						hidden={companies.length > 0}
+						onClick={() => changeCompanies(findPair())}
+					>
+						Start
+					</Button>
+					<h2> { generatePrompt() }</h2>
+					<ProgressBar 
+					    	animated 
+					    	variant="success" 
+					    	now={((count / 100) * 100) } 
+					    	label={((count / 100) * 100) + "%"}
+				    />
+					{ companies.length > 0 ? <Row>
+							<Col xs="auto">
+								<Item 
+									info={companies[0]["co"].info} 
+								/>
+								<Button 
+									onClick={() => updateMatchup(0)}
+								>
+									Most { window.location.href.split("?")[1] }
+								</Button>
+							</Col>
+							<Col xs="auto">
+								<Item 
+									info={companies[1]["co"].info} 
+								/>
+								<Button 
+									onClick={() => updateMatchup(1)}
+								>
+									Most { window.location.href.split("?")[1] }
+								</Button>
+							</Col>
+						</Row>
+						: ""
+					}
+				</Container>
+			)
+		} else {
+			return(
+				<Container>
+					<Row>
+						<h2>Congrats! You are done</h2>
 					</Row>
-					: ""
-				}
-			</Container>
-		)
+					<Row>
+						<h4>Add this code to the HIIT { Math.random().toString().split(".")[1] } </h4>
+					</Row>
+				</Container>
+			)
+		}
 	} else {
 		return(
 			<Spinner animation="border" variant="primary" />
